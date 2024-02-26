@@ -1,10 +1,72 @@
+#include <iostream>
+#include <cstdlib>
+#include <stdio.h>
 #include <windows.h>
+#include <winuser.h>
 
+using namespace std;
+
+char t1[100], t2[100];
+HWND textfield,textbox1,textbox2, b1,b2,b3,b4;
 /* This is where all the input to the window goes to */
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	switch(Message) {
-		
+		case WM_ERASEBKGND: 
+		{
+    		HDC hdc = (HDC)wParam;
+    		RECT rect;
+    		GetClientRect(hwnd, &rect);
+    		HBRUSH hBrush = CreateSolidBrush(RGB(0, 255, 255)); 
+    		FillRect(hdc, &rect, hBrush);
+    		DeleteObject(hBrush);
+    		return (LRESULT)TRUE; 
+		}
+		case WM_CREATE:
+
+		textfield = CreateWindow("STATIC","Plese input two numbers",WS_VISIBLE|WS_CHILD|WS_BORDER,20,20,200,25,hwnd,NULL,NULL,NULL);
+		textbox1 = CreateWindow("EDIT","",WS_VISIBLE|WS_CHILD|WS_BORDER,30,50,170,25,hwnd,NULL,NULL,NULL);
+		textbox2 = CreateWindow("EDIT","",WS_VISIBLE|WS_CHILD|WS_BORDER,30,80,170,25,hwnd,NULL,NULL,NULL);
+		b1 = CreateWindow("BUTTON","+",WS_VISIBLE|WS_CHILD|WS_BORDER,70,120,25,25,hwnd,(HMENU) 1,NULL,NULL);
+		b2 = CreateWindow("BUTTON","-",WS_VISIBLE|WS_CHILD|WS_BORDER,100,120,25,25,hwnd,(HMENU) 2,NULL,NULL);
+		b3 = CreateWindow("BUTTON","*",WS_VISIBLE|WS_CHILD|WS_BORDER,130,120,25,25,hwnd,(HMENU) 3,NULL,NULL);
+		b4 = CreateWindow("BUTTON","/",WS_VISIBLE|WS_CHILD|WS_BORDER,160,120,25,25,hwnd,(HMENU) 4,NULL,NULL);
+		break;
 		/* Upon destruction, tell the main thread to stop */
+		case WM_COMMAND: {
+			GetWindowText(textbox1, t1, 100);
+    		GetWindowText(textbox2, t2, 100);
+    		double a = atof(t1);
+    		double b = atof(t2);
+    		char result[100];
+			double plus,minus,time,divide;
+			switch (LOWORD(wParam))
+			{
+				case 1:	
+					plus = a + b;
+            		sprintf(result, "%f", plus);
+            		MessageBox(hwnd, result, "Result", MB_OK);
+            		break;
+				case 2:
+					minus = a - b;
+            		sprintf(result, "%f", minus);
+            		MessageBox(hwnd, result, "Result", MB_OK);
+            		break;
+				case 3:
+					time = a*b;
+					sprintf(result, "%f", time);
+					MessageBox(hwnd, result, "Result", MB_OK);
+					break;
+
+				case 4:
+					divide = a/b;
+					sprintf(result, "%f", divide);
+					MessageBox(hwnd, result, "Result", MB_OK);
+					break;
+
+			}
+
+			break;
+		}
 		case WM_DESTROY: {
 			PostQuitMessage(0);
 			break;
@@ -22,6 +84,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	WNDCLASSEX wc; /* A properties struct of our window */
 	HWND hwnd; /* A 'HANDLE', hence the H, or a pointer to our window */
 	MSG msg; /* A temporary location for all messages */
+
 
 	/* zero out the struct and set the stuff we want to modify */
 	memset(&wc,0,sizeof(wc));
@@ -41,11 +104,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
-	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","Caption",WS_VISIBLE|WS_OVERLAPPEDWINDOW,
+	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","My Calculator",WS_VISIBLE|WS_SYSMENU,
 		CW_USEDEFAULT, /* x */
 		CW_USEDEFAULT, /* y */
-		640, /* width */
-		480, /* height */
+		250, /* width */
+		200, /* height */
 		NULL,NULL,hInstance,NULL);
 
 	if(hwnd == NULL) {
@@ -64,3 +127,4 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	return msg.wParam;
 }
+
